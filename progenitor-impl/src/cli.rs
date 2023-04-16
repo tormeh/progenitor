@@ -9,6 +9,7 @@ use quote::{format_ident, quote};
 use typify::{Type, TypeEnumVariant, TypeSpaceImpl, TypeStructPropInfo};
 
 use crate::{
+    Security,
     method::{
         OperationParameterKind, OperationParameterType, OperationResponseStatus,
     },
@@ -31,6 +32,8 @@ impl Generator {
         crate_name: &str,
     ) -> Result<TokenStream> {
         validate_openapi(spec)?;
+
+        let security = Security::from(spec);
 
         // Convert our components dictionary to schemars
         let schemas = spec.components.iter().flat_map(|components| {
@@ -57,6 +60,7 @@ impl Generator {
                     &spec.components,
                     path,
                     method,
+                    &security,
                     path_parameters,
                 )
             })

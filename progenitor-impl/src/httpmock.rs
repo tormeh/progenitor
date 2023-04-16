@@ -14,7 +14,7 @@ use crate::{
     },
     to_schema::ToSchema,
     util::{sanitize, Case},
-    validate_openapi, Generator, Result,
+    validate_openapi, Generator, Result, Security,
 };
 
 struct MockOp {
@@ -41,6 +41,7 @@ impl Generator {
         });
 
         self.type_space.add_ref_types(schemas)?;
+        let security = Security::default(); //TODO
 
         let raw_methods = spec
             .paths
@@ -58,6 +59,7 @@ impl Generator {
                     &spec.components,
                     path,
                     method,
+                    &security,
                     path_parameters,
                 )
             })
