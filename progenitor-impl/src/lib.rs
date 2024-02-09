@@ -225,7 +225,8 @@ impl Security {
         let mut schemes = 
             requirements
                 .iter()
-                .map(|(name,requirements)| {
+                .map(|(name, _)| { // TODO: Support values for oauth and openidconnect. Reject values when non-null otherwise
+                                            // See https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.3.md#patterned-fields-3
                     self.schemes
                         .get(name)
                         .expect("Contains that name, otherwise spec is buggy. qed")

@@ -258,13 +258,6 @@ impl PartialOrd for OperationResponseStatus {
     }
 }
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
-pub(crate) enum OperationResponseFormat {
-    Json,
-    XML,
-    // TODO more
-}
-
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
 pub(crate) enum OperationResponseKind {
     Type(TypeId),
@@ -921,9 +914,10 @@ impl Generator {
                         }
                     })
                 }
-                SecurityScheme::APIKey { location, name, .. } => {
+                SecurityScheme::APIKey { .. } => {
+                    todo!("Non-header APIKeys")
                 }
-                SecurityScheme::HTTP { scheme, bearer_format, description, extensions } => {
+                SecurityScheme::HTTP { .. } => {
                     todo!("Craft http header")
                 }
                 _ => todo!("Only header APIKeys are supported right now"),
