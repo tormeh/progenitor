@@ -210,7 +210,7 @@ impl Default for Generator {
 
 #[derive(Debug, Clone, Default)]
 pub(crate) struct Security {
-    pub(crate) per_path: IndexMap<String, SecurityRequirement>, 
+    pub(crate) per_path: IndexMap<String, SecurityRequirement>,
     /// The global available security requirements, the defaults, named, which must be ref'd by overrides
     pub(crate) global: Vec<SecurityRequirement>,
     /// Declares the scheme and which header to use, each one referenced above must exist in the below
@@ -219,18 +219,23 @@ pub(crate) struct Security {
 
 // usuful to derive the global fallback, if any
 impl Security {
-    pub(crate) fn resolve_for_path(&self, path: &PathTemplate) -> Option<SecurityScheme> {
+    pub(crate) fn resolve_for_path(
+        &self,
+        path: &PathTemplate,
+    ) -> Option<SecurityScheme> {
         let path = path.to_string();
-        let requirements = self.per_path.get(&path).cloned().or_else(|| { self.global.first().cloned() })?;
-        let mut schemes = 
-            requirements
-                .iter()
-                .map(|(name, _)| { // TODO: Support values for oauth and openidconnect. Reject values when non-null otherwise
-                                            // See https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.3.md#patterned-fields-3
-                    self.schemes
-                        .get(name)
-                        .expect("Contains that name, otherwise spec is buggy. qed")
-                });
+        let requirements = self
+            .per_path
+            .get(&path)
+            .cloned()
+            .or_else(|| self.global.first().cloned())?;
+        let mut schemes = requirements.iter().map(|(name, _)| {
+            // TODO: Support values for oauth and openidconnect. Reject values when non-null otherwise
+            // See https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.3.md#patterned-fields-3
+            self.schemes
+                .get(name)
+                .expect("Contains that name, otherwise spec is buggy. qed")
+        });
         // TODO let's start with exactly one or zero schemes
         assert!(schemes.len() <= 1);
         schemes.next().cloned()

@@ -6,7 +6,10 @@ use std::{
     str::FromStr,
 };
 
-use openapiv3::{Components, Parameter, ReferenceOr, Response, StatusCode, APIKeyLocation, SecurityScheme};
+use openapiv3::{
+    APIKeyLocation, Components, Parameter, ReferenceOr, Response,
+    SecurityScheme, StatusCode,
+};
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote, ToTokens};
 use typify::{TypeId, TypeSpace};
@@ -14,10 +17,9 @@ use typify::{TypeId, TypeSpace};
 use crate::{
     template::PathTemplate,
     util::{items, parameter_map, sanitize, unique_ident_from, Case},
-    Error, Generator, Result, TagStyle, Security,
+    Error, Generator, Result, Security, TagStyle,
 };
 use crate::{to_schema::ToSchema, util::ReferenceOrExt};
-
 
 /// The intermediate representation of an operation that will become a method.
 pub(crate) struct OperationMethod {
@@ -840,10 +842,8 @@ impl Generator {
         let result_ident = unique_ident_from("result", &param_names);
 
         // Generate code for query parameters.
-        let query_items = Vec::from_iter(method
-            .params
-            .iter()
-            .filter_map(|param| match &param.kind {
+        let query_items = Vec::from_iter(method.params.iter().filter_map(
+            |param| match &param.kind {
                 OperationParameterKind::Query(required) => {
                     let qn = &param.api_name;
                     let qn_ident = format_ident!("{}", &param.name);
@@ -862,7 +862,8 @@ impl Generator {
                     Some(res)
                 }
                 _ => None,
-            }));
+            },
+        ));
 
         let (query_build, query_use) = if query_items.is_empty() {
             (quote! {}, quote! {})
@@ -902,10 +903,15 @@ impl Generator {
                 _ => None,
             })
             .collect::<Vec<_>>();
- 
-        if let Some(sec_scheme) = method.security.resolve_for_path(&method.path) {
+
+        if let Some(sec_scheme) = method.security.resolve_for_path(&method.path)
+        {
             match sec_scheme {
-                SecurityScheme::APIKey { location: APIKeyLocation::Header, name, .. } => {
+                SecurityScheme::APIKey {
+                    location: APIKeyLocation::Header,
+                    name,
+                    ..
+                } => {
                     let hn = name;
                     headers.push(quote!{
                         {
@@ -921,9 +927,9 @@ impl Generator {
                     todo!("Craft http header")
                 }
                 _ => todo!("Only header APIKeys are supported right now"),
-            }  
+            }
         };
-        
+
         let (headers_build, headers_use) = if headers.is_empty() {
             (quote! {}, quote! {})
         } else {
@@ -932,7 +938,7 @@ impl Generator {
                 let mut header_map = HeaderMap::with_capacity(#size);
                 #( #headers )*
             };
-            
+
             let headers_use = quote! {
                 .headers(header_map)
             };

@@ -9,13 +9,12 @@ use quote::{format_ident, quote};
 use typify::{Type, TypeEnumVariant, TypeSpaceImpl, TypeStructPropInfo};
 
 use crate::{
-    Security,
     method::{
         OperationParameterKind, OperationParameterType, OperationResponseStatus,
     },
     to_schema::ToSchema,
     util::{sanitize, Case},
-    validate_openapi, Generator, Result,
+    validate_openapi, Generator, Result, Security,
 };
 
 struct CliOperation {

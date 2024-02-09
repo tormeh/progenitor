@@ -4,7 +4,8 @@ use std::collections::BTreeMap;
 
 use indexmap::IndexMap;
 use openapiv3::{
-    Components, Parameter, ReferenceOr, RequestBody, Response, Schema, SecurityScheme,
+    Components, Parameter, ReferenceOr, RequestBody, Response, Schema,
+    SecurityScheme,
 };
 use unicode_ident::{is_xid_continue, is_xid_start};
 
@@ -51,8 +52,10 @@ pub(crate) fn parameter_map<'a>(
     refs: &'a [ReferenceOr<Parameter>],
     components: &'a Option<Components>,
 ) -> Result<BTreeMap<&'a String, &'a Parameter>> {
-    Result::from_iter(items(refs, components)
-        .map(|res| res.map(|param| (&param.parameter_data_ref().name, param)))
+    Result::from_iter(
+        items(refs, components).map(|res| {
+            res.map(|param| (&param.parameter_data_ref().name, param))
+        }),
     )
 }
 
